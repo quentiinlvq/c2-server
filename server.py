@@ -26,3 +26,5 @@ while True:
     t = threading.Thread(target=handle_connection, args=(connection,address))
     THREADS.append(t)
     t.start()
+
+ss.close()
