@@ -13,6 +13,8 @@ def handle_connection(connection,address):
     while msg != 'quit':
         print(msg)
         connection.send(msg.encode())
+        msg = connection.recv(1024).decode()
+    close_connection(connection)
 
 def close_connection(connection):
     connection.close()
@@ -27,4 +29,4 @@ while True:
     THREADS.append(t)
     t.start()
 
-ss.close()
+#ss.close()
