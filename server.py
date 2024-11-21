@@ -5,7 +5,7 @@ ip_address = '127.0.0.1'
 port_number = 1234
 
 def handle_connection(connection, address):
-    print(f"[+] Connection established from {address}")
+    print(f"Connection established from {address}")
     while True:
         try:
             command = input("Enter command to execute (or 'quit' to exit): ")
