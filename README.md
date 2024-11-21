@@ -8,3 +8,6 @@ Multiplateforme : Compatible avec Windows, Linux et macOS.
 ## 📋 Prérequis
 Python >= 3.8
 pip pour gérer les dépendances
+
+## 😎️ Utilisation
+Installer les dépendances du fichier *requirements.txt*
