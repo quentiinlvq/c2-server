@@ -1,7 +1,7 @@
 import socket
 import threading
 
-ip_address = '127.0.0.1'
+ip_address = '0.0.0.0'
 port_number = 1234
 
 def handle_connection(connection, address):
