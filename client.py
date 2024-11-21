@@ -7,7 +7,7 @@ port_number = 1234
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
-    print("[*] Connected to the server")
+    print("Connected to the server")
 
     while True:
         try:

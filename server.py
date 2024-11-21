@@ -14,7 +14,6 @@ def handle_connection(connection, address):
                 break
             connection.send(command.encode())
 
-            # Receive command output from client
             response = connection.recv(4096).decode()
             print(f"Output:\n{response}")
         except Exception as e:
@@ -27,7 +26,7 @@ def start_server():
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ss.bind((ip_address, port_number))
     ss.listen(5)
-    print(f"[*] Server listening on {ip_address}:{port_number}")
+    print(f"Server listening on {ip_address}:{port_number}")
 
     while True:
         connection, address = ss.accept()
