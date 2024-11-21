@@ -17,7 +17,7 @@ def handle_connection(connection, address):
             response = connection.recv(4096).decode()
             print(f"Output:\n{response}")
         except Exception as e:
-            print(f"[-] Error: {e}")
+            print(f"Error: {e}")
             break
 
     connection.close()
