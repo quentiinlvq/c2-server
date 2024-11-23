@@ -24,6 +24,6 @@ pip install -r requirements.txt
 
 ## 👥 Contributors
 This project is the result of the collaborative efforts of:
-- **Quentin Lévêque (me)** ([@Quentiinlvq](https://github.com/quentiinlvq))  
+- **Quentin Lévêque (me)** ([@quentiinlvq](https://github.com/quentiinlvq))  
 - **Lucas le Porhiel** ([@91llp](https://github.com/91llp))  
 - **Robin Pongenty** ([@robii06](https://github.com/robii06))  
