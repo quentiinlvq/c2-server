@@ -1,13 +1,29 @@
-# 🕵️‍♂️ C2 Server
-Un serveur Command & Control (C2) performant, conçu pour orchestrer les agents et gérer les communications de manière sécurisée et efficace.
+# 🕵️‍♂️ Command & Control Server  
+A robust and secure C2 server designed to efficiently orchestrate agents and ensure reliable communications.
 
-## 🚀 Fonctionnalités
-Gestion en temps réel des agents connectés.
-Multiplateforme : Compatible avec Windows, Linux et macOS.
+## 🚀 Features
+Our command-line-based C2 includes the following capabilities:
+- 🔙 **Reverse Shell**: Execute commands on remote machines and retrieve their outputs securely.  
+- 🎹 **Advanced Keylogger**: Capture keystrokes in real-time with high precision.  
+- 🌐 **Port Scanner**: Quickly identify open ports on target machines to assess network vulnerabilities.
 
-## 📋 Prérequis
-Python >= 3.8
-pip pour gérer les dépendances
+## 📋 Prerequisites
+- **Python**: Version 3.8 or higher is required.  
+- **pip**: Ensure `pip` is installed to manage the project dependencies.  
+You can check your Python and pip versions by running the following commands:
+```bash
+python --version
+pip --version
+```
 
-## 😎️ Utilisation
-Installer les dépendances du fichier *requirements.txt*
+## 😎️ Usage
+Before using the project, make sure to install all the required dependencies listed in the *requirements.txt* file. To do so, run the following command:
+```bash
+pip install -r requirements.txt
+```
+
+## 👥 Contributors
+This project is the result of the collaborative efforts of:
+- **Quentin Lévêque (me)** ([@Quentiinlvq](https://github.com/quentiinlvq))  
+- **Lucas le Porhiel** ([@91llp](https://github.com/91llp))  
+- **Robin Pongenty** ([@robii06](https://github.com/robii06))  
