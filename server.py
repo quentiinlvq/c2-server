@@ -38,7 +38,6 @@ def handle_connection(connection, address):
                 with open("screen.png", "wb") as f:
                     f.write(img_data)
                 print("Capture réussie !")
-                print("Capture réussie !")
                 continue
 
             elif command.startswith("scan"):
