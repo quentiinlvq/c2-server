@@ -91,7 +91,6 @@ def connect_to_server():
             print("La connexion avec le serveur a été réinitialisée.")
             break
         except Exception as e:
-            print(f"Erreur : {e}")
             cs.send(f"Error: {e}".encode())
             break
 
