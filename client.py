@@ -63,20 +63,16 @@ def scan_ports(start_port, end_port):
     :return: Liste des ports ouverts
     """
     open_ports = []
-    print(f"Scanning {ip_address} de {start_port} à {end_port}...")
     for port in range(start_port, end_port + 1):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             socket.setdefaulttimeout(1)  # Timeout de 1 seconde
             result = sock.connect_ex((ip_address, port))
             if result == 0:
-                print(f"Port {port} est OUVERT.")
                 open_ports.append(port)
-            else:
-                print(f"Port {port} est FERMÉ.")
             sock.close()
         except Exception as e:
-            print(f"Erreur lors du scan du port {port}: {e}")
+            pass  # Pas d'affichage pour le client
     return open_ports
 
 if __name__ == "__main__":

