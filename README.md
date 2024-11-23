@@ -4,7 +4,7 @@ A robust and secure C2 server designed to efficiently orchestrate agents and ens
 ## 🚀 Features
 Our command-line-based C2 includes the following capabilities:
 - 🔙 **Reverse Shell**: Execute commands on remote machines and retrieve their outputs securely.  
-- 🎹 **Advanced Keylogger**: Capture keystrokes in real-time with high precision.  
+- 🎹 **Keylogger**: Capture keystrokes in real-time with high precision.  
 - 🌐 **Port Scanner**: Quickly identify open ports on target machines to assess network vulnerabilities.
 
 ## 📋 Prerequisites
@@ -24,6 +24,6 @@ pip install -r requirements.txt
 
 ## 👥 Contributors
 This project is the result of the collaborative efforts of:
-- **Quentin Lévêque (me)** ([@Quentiinlvq](https://github.com/quentiinlvq))  
+- **Quentin Lévêque (me)** ([@quentiinlvq](https://github.com/quentiinlvq))  
 - **Lucas le Porhiel** ([@91llp](https://github.com/91llp))  
 - **Robin Pongenty** ([@robii06](https://github.com/robii06))  
