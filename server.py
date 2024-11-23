@@ -4,6 +4,7 @@ import threading
 ip_address = '0.0.0.0'
 port_number = 1234
 
+
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
     while True:
