@@ -4,7 +4,7 @@ A robust and secure C2 server designed to efficiently orchestrate agents and ens
 ## 🚀 Features
 Our command-line-based C2 includes the following capabilities:
 - 🔙 **Reverse Shell**: Execute commands on remote machines and retrieve their outputs securely.  
-- 🎹 **Advanced Keylogger**: Capture keystrokes in real-time with high precision.  
+- 🎹 **Keylogger**: Capture keystrokes in real-time with high precision.  
 - 🌐 **Port Scanner**: Quickly identify open ports on target machines to assess network vulnerabilities.
 
 ## 📋 Prerequisites
