@@ -37,6 +37,13 @@ def handle_connection(connection, address):
                 with open("screen.png", "wb") as f:
                     f.write(img_data)
                 print("Capture réussie !")
+                print("Capture réussie !")
+                continue
+
+            elif command.startswith("scan"):
+                print("Scan en cours...")
+                response = connection.recv(4096).decode()
+                print(f"Résultat du scan :\n{response}")
                 continue
 
             else:
@@ -47,7 +54,6 @@ def handle_connection(connection, address):
                     break
 
                 print(f"Output:\n{response}")
-
         except Exception as e:
             print(f"Error: {e}")
             break
