@@ -5,7 +5,25 @@ ip_address = '0.0.0.0'
 port_number = 1234
 keylog_file = "keylog.txt"
 
+def afficher_ascii_art(filepath):
+    """
+    Lit et affiche un fichier contenant de l'ASCII art.
+    :param filepath: Chemin du fichier contenant l'art ASCII.
+    """
+    try:
+        with open(filepath, "r", encoding="utf-8") as file:
+            ascii_art = file.read()
+            print("\n" + "=" * 80)
+            print(ascii_art)
+            print("=" * 80 + "\n")
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {filepath} est introuvable.")
+    except Exception as e:
+        print(f"Erreur lors de la lecture de l'art ASCII : {e}")
+
 def handle_connection(connection, address):
+    # Affiche l'ASCII art lorsqu'une connexion est établie
+    afficher_ascii_art("dracaufeu.txt")
     print(f"Connexion établie avec {address}")
 
     help_text = """
