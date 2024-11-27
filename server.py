@@ -55,7 +55,13 @@ def handle_connection(connection, address):
                 print("Capture réussie !")
                 continue
 
-            elif command.startswith("scan"):
+            elif command.startswith('scan'):
+                parts = command.split()
+                if len(parts) != 3:
+                    print("Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>")
+                    continue
+
+                connection.send(command.encode())
                 print("Scan en cours...")
                 response = connection.recv(4096).decode()
                 print(f"Résultat du scan :\n{response}")
