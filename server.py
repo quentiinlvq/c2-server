@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 ip_address = '0.0.0.0'
 port_number = 1234
@@ -7,15 +8,36 @@ keylog_file = "keylog.txt"
 
 def afficher_ascii_art(filepath):
     """
-    Lit et affiche un fichier contenant de l'ASCII art.
+    Lit et affiche un fichier contenant de l'ASCII art avec coloration spécifique pour les caractères +, -, ., :, =, *, et @.
+    L'affichage se fait progressivement ligne par ligne.
     :param filepath: Chemin du fichier contenant l'art ASCII.
     """
     try:
         with open(filepath, "r", encoding="utf-8") as file:
-            ascii_art = file.read()
             print("\n" + "=" * 80)
-            print(ascii_art)
-            print("=" * 80 + "\n")
+            for line in file:
+                # Supposons que la frontière entre les formes est à la moitié de la ligne
+                middle_index = len(line) // 2
+                left_part = (line[:middle_index]
+                             .replace('+', '\033[31m+\033[0m')
+                             .replace('-', '\033[31m-\033[0m')
+                             .replace('.', '\033[31m.\033[0m')
+                             .replace(':', '\033[31m:\033[0m')
+                             .replace('=', '\033[31m=\033[0m')
+                             .replace('*', '\033[31m*\033[0m')
+                             .replace('@', '\033[30m@\033[0m'))
+                right_part = (line[middle_index:]
+                              .replace('+', '\033[35m+\033[0m')
+                              .replace('-', '\033[35m-\033[0m')
+                              .replace('.', '\033[35m.\033[0m')
+                              .replace(':', '\033[35m:\033[0m')
+                              .replace('=', '\033[35m=\033[0m')
+                              .replace('*', '\033[35m*\033[0m')
+                              .replace('@', '\033[30m@\033[0m'))
+                # Affichage progressif de la ligne
+                print(left_part + right_part, end='', flush=True)
+                time.sleep(0.1)  # Délai rapide entre les lignes
+            print("\n" + "=" * 80)
     except FileNotFoundError:
         print(f"Erreur : Le fichier {filepath} est introuvable.")
     except Exception as e:
