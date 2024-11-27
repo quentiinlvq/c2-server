@@ -3,9 +3,12 @@ A robust and secure C2 server designed to efficiently orchestrate agents and ens
 
 ## 🚀 Features
 Our command-line-based C2 includes the following capabilities:
-- 🔙 **Reverse Shell**: Execute commands on remote machines and retrieve their outputs securely.  
-- 🎹 **Keylogger**: Capture keystrokes in real-time with high precision.  
-- 🌐 **Port Scanner**: Quickly identify open ports on target machines to assess network vulnerabilities.
+- 🔙 Reverse Shell: Execute commands on remote machines and retrieve their outputs securely.
+- 🎹 Keylogger: Capture keystrokes in real-time with high precision.
+- 🌐 Port Scanner: Quickly identify open ports on target machines to assess network vulnerabilities.
+- 📸 Screenshot Capture: Take screenshots of the target machine's desktop remotely.
+- 🎥 Webcam Access: Capture photos using the victim's webcam for further insights.
+- 🔄 Multi-Agent Support (In Progress): Work is underway to enable multi-threading for managing multiple agent connections simultaneously, ensuring seamless interaction with multiple targets.
 
 ## 📋 Prerequisites
 - **Python**: Version 3.8 or higher is required.  
